@@ -1,7 +1,9 @@
 .App {
   text-align: center;
 }
-
+h1{
+    text-align: center;
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -35,4 +37,9 @@
   to {
     transform: rotate(360deg);
   }
+}
+canvas {
+  display: block;
+  margin: 0 auto;
+  border: 1px solid black;
 }
