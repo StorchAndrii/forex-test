@@ -1,7 +1,6 @@
 import {Bar} from "../types/bar.type";
 
 
-
 export class DataLoader {
     private readonly apiUrl: string;
 
@@ -18,12 +17,11 @@ export class DataLoader {
             }
 
             const data = await response.json();
-            console.log("API Response:", data); // Для отладки
 
-            // Объединяем все бары в один массив и корректируем время
-            const allBars: Bar[] = data.flatMap((chunk: any) =>
+
+            return data.flatMap((chunk: any) =>
                 chunk.Bars.map((bar: any) => ({
-                    time: (chunk.ChunkStart + bar.Time) * 1000, // Учитываем смещение времени
+                    time: (chunk.ChunkStart + bar.Time) * 1000,
                     open: bar.Open,
                     high: bar.High,
                     low: bar.Low,
@@ -31,12 +29,9 @@ export class DataLoader {
                     volume: bar.TickVolume,
                 }))
             );
-
-            console.log("Загруженные бары:", allBars); // Отладочный вывод
-            return allBars;
         } catch (error) {
-            console.error("Ошибка при загрузке данных:", error);
-            return []; // Возвращаем пустой массив при ошибке
+            console.error("Error:", error);
+            return [];
         }
     }
 }

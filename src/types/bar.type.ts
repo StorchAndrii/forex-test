@@ -1,5 +1,5 @@
 export interface Bar {
-    time: number;   // Время в Unix-формате
+    time: number;
     open: number;
     high: number;
     low: number;

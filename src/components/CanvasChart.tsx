@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ChartRenderer } from "../services/ChartRenderer";
+import { ChartRenderer } from "../renderers/ChartRenderer";
 import { Bar } from "../types/bar.type";
-import { DataLoader } from "../services/DataLoader";
+import { DataLoader } from "../renderers/DataLoader";
 
 interface CanvasChartProps {
     apiUrl: string;
@@ -12,37 +12,28 @@ const CanvasChart: React.FC<CanvasChartProps> = ({ apiUrl }) => {
     const [bars, setBars] = useState<Bar[]>([]);
     const [renderer, setRenderer] = useState<ChartRenderer | null>(null);
 
-    // Загружаем данные с API
     useEffect(() => {
         const dataLoader = new DataLoader(apiUrl);
-        dataLoader.fetchBars().then((loadedBars) => {
-            setBars(loadedBars);
-        });
+        dataLoader.fetchBars().then((loadedBars) => setBars(loadedBars));
     }, [apiUrl]);
 
-    // Инициализируем ChartRenderer после загрузки данных
+
     useEffect(() => {
         if (canvasRef.current && bars.length > 0) {
             const canvas = canvasRef.current;
             const ctx = canvas.getContext("2d")!;
-            const chartRenderer = new ChartRenderer(ctx, canvas.width, canvas.height, bars);
+            const chartRenderer = new ChartRenderer(ctx, canvas.width, canvas.height, bars, canvas); // Додаємо canvas як аргумент
+
             setRenderer(chartRenderer);
-            chartRenderer.draw(); // Отрисовываем график
-
-            // Привязываем события мыши
-            canvas.addEventListener("mousedown", chartRenderer.onMouseDown);
-
-            // Очистка слушателей при размонтировании
-            return () => {
-                canvas.removeEventListener("mousedown", chartRenderer.onMouseDown);
-            };
+            chartRenderer.draw();
         }
     }, [bars]);
 
-    // Обработчик для масштабирования колесом мыши
+    // Обробник для масштабування колесом миші
     const handleWheel = (e: React.WheelEvent) => {
         if (renderer) {
-            const newZoomLevel = renderer.getZoomLevel() + (e.deltaY > 0 ? -0.1 : 0.1);
+            const currentZoom = renderer.getZoomLevel();
+            const newZoomLevel = currentZoom + (e.deltaY > 0 ? -0.1 : 0.1);
             renderer.setZoomLevel(newZoomLevel);
         }
     };
